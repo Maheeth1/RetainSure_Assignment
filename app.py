@@ -1,10 +1,11 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, send_from_directory
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import get_db, init_db, get_user_by_id, get_all_users_db, create_user_db, update_user_db, delete_user_db, search_users_db, get_user_by_email
 import json
 import logging
+import os # Import os module
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='frontend/build/static', template_folder='frontend/build')
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -13,27 +14,27 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # with app.app_context():
 #     init_db()
 
-# NEW: Route to serve the main HTML page
-@app.route('/') # Or just '/' if you want the UI as the main entry point
-def serve_ui():
-    return render_template('index.html')
+# Serve React App
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react_app(path):
+    if path != "" and os.path.exists(app.template_folder + '/' + path):
+        return send_from_directory(app.template_folder, path)
+    else:
+        return send_from_directory(app.template_folder, 'index.html')
 
-# @app.route('/')
-# def home():
-#     return jsonify({"message": "User Management System API is running"}), 200
-
+# Your existing API routes remain the same below this point
 @app.route('/users', methods=['GET'])
 def get_all_users():
     try:
         users = get_all_users_db()
-        # Convert Row objects to dictionaries for jsonify
         users_list = [dict(user) for user in users]
         return jsonify(users_list), 200
     except Exception as e:
         logging.error(f"Error fetching all users: {e}")
         return jsonify({"error": "Internal server error"}), 500
 
-@app.route('/user/<int:user_id>', methods=['GET']) # Changed to int converter
+@app.route('/user/<int:user_id>', methods=['GET'])
 def get_user(user_id):
     try:
         user = get_user_by_id(user_id)
@@ -48,7 +49,7 @@ def get_user(user_id):
 @app.route('/users', methods=['POST'])
 def create_user():
     try:
-        data = request.get_json() # Use get_json() for JSON data
+        data = request.get_json()
         if not data:
             return jsonify({"error": "Invalid JSON data"}), 400
 
@@ -58,8 +59,7 @@ def create_user():
 
         if not all([name, email, password]):
             return jsonify({"error": "Missing name, email, or password"}), 400
-
-        # Basic email validation
+            
         if "@" not in email or "." not in email:
             return jsonify({"error": "Invalid email format"}), 400
 
@@ -71,7 +71,8 @@ def create_user():
             return jsonify({"message": "User created successfully", "user_id": user_id}), 201
         else:
             logging.warning(f"Failed to create user: Email '{email}' might already exist.")
-            return jsonify({"error": "User with this email already exists"}), 409 # Conflict
+            return jsonify({"error": "User with this email already exists"}), 409
+
     except Exception as e:
         logging.error(f"Error creating user: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -150,7 +151,7 @@ def login():
             return jsonify({"status": "success", "user_id": user['id'], "message": "Login successful"}), 200
         else:
             logging.warning(f"Login failed for email: {email}")
-            return jsonify({"status": "failed", "message": "Invalid email or password"}), 401 # Unauthorized
+            return jsonify({"status": "failed", "message": "Invalid email or password"}), 401
     except Exception as e:
         logging.error(f"Error during login: {e}")
         return jsonify({"error": "Internal server error"}), 500
