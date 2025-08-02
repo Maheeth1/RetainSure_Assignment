@@ -17,6 +17,7 @@ This repository contains solutions for the Retain coding challenge, which includ
 - SQLAlchemy
 - Marshmallow (for data validation)
 - `pytest` for testing
+- React
 
 ### 📁 Setup Instructions
 
