@@ -92,7 +92,7 @@ pytest
 ```
 
 ### 📄 CHANGES.md
-- A detailed changelog, code issues identified, architecture decisions, and AI usage notes are documented in the CHANGES.md file for each task.
+- A detailed changelog, code issues identified, architecture decisions, and AI usage notes are documented in the `CHANGES.md` file for each task.
 
 ---
-**Note**: AI assistance (ChatGPT & Copilot) was used for code review, error handling improvements, test design, and documentation structure. See CHANGES.md for details.
+**Note**: AI assistance (ChatGPT & Gemini) was used for code review, error handling improvements, test design, and documentation structure. See `CHANGES.md` for details.
