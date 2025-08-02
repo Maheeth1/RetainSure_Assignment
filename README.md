@@ -1,6 +1,6 @@
 # Retain Coding Challenge
 
-This repository contains solutions for the Retain coding challenge, which includes two independent tasks:
+This repository contains solutions for the RetainSure coding challenge, which includes two independent tasks:
 
 - ✅ **Task 1: Code Refactoring Challenge** (`messy-migration`)
 - ✅ **Task 2: URL Shortener Service** (`url-shortener`)
